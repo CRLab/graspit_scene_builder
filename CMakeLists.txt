@@ -1,15 +1,21 @@
 
 cmake_minimum_required(VERSION 2.8.3)
-project(graspit_shape_completion)
+project(graspit_scene_builder_plugin)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED graspit shape_msgs actionlib)
+find_package(catkin REQUIRED COMPONENTS graspit shape_msgs graspit_msgs actionlib)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package(Qt4 COMPONENTS QtCore QtGui  REQUIRED)
+find_package(PCL 1.2 REQUIRED)
+
+
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -55,18 +61,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 # )
 
 ## Generate actions in the 'action' folder
- add_action_files(
-   FILES
-   GetSegmentedMeshedScene.action
-   CompleteMesh.action
- )
+add_action_files(
+    FILES
+    GetSegmentedMeshedScene.action
+    CompleteMesh.action
+    )
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
-   DEPENDENCIES
+    DEPENDENCIES
     shape_msgs
     actionlib
- )
+    )
 
 ###################################
 ## catkin specific configuration ##
@@ -78,11 +84,11 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES test
-#  CATKIN_DEPENDS
-#  DEPENDS system_lib
-)
+    #  INCLUDE_DIRS include
+    LIBRARIES graspit_scene_builder
+    #  CATKIN_DEPENDS
+    #  DEPENDS system_lib
+    )
 
 ###########
 ## Build ##
@@ -101,14 +107,14 @@ include_directories(${catkin_INCLUDE_DIRS} ${QT_INCLUDES})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 set(SOURCES
-     src/main.cpp
-     src/ros_graspit_interface.cpp)
+    src/main.cpp
+    src/ros_graspit_interface.cpp)
 
 set(HEADERS
-     )
+    )
 
 set(MOCS
-     include/graspit_shape_completion/ros_graspit_interface.h)
+    include/graspit_shape_completion/ros_graspit_interface.h)
 
 qt4_wrap_cpp(GENERATED_SOURCES ${MOCS})
 
@@ -118,25 +124,26 @@ source_group("Generated Sources - Do Not Edit" FILES ${GENERATED_SOURCES})
 include_directories("${CMAKE_BINARY_DIR}")
 
 ## Declare a cpp library
- add_library(graspit_shape_completion_interface
+add_library(graspit_scene_builder
     ${SOURCES}
     ${HEADERS}
     ${GENERATED_SOURCES}
     ${MOCS}
- )
+    )
 
 ## Declare a cpp executable
 # add_executable(test_node src/test_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
- add_dependencies(graspit_shape_completion_interface graspit ${QT_DEFINITIONS})
+add_dependencies(graspit_scene_builder graspit graspit_msgs trajectory_planner_msgs ${QT_DEFINITIONS})
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(graspit_shape_completion_interface
-   ${catkin_LIBRARIES}
-   ${QT_LIBRARIES}
- )
+target_link_libraries(graspit_scene_builder
+    ${catkin_LIBRARIES}
+    ${QT_LIBRARIES}
+    ${PCL_LIBRARIES}
+    )
 
 
 

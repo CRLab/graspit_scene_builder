@@ -1,15 +1,9 @@
 <?xml version="1.0"?>
 <package>
-  <name>graspit_shape_completion</name>
+  <name>graspit_scene_builder_plugin</name>
   <version>0.0.0</version>
   <description>
-
-    ROS interface to GraspIt! exposing a number of services such as
-    loading objects or obstacles into the GraspIt! world, or performing
-    graspl planning or testing for the PR2 gripper. Originally
-    developped to serve the needs of the probabilistic_grasp_planner
-    node and project; can serve as an example of how to use GraspIt!
-    from within ROS.
+    ROS interface to shape completion and object recognition via 3D RANSAC.
 
   </description>
 

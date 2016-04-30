@@ -38,7 +38,7 @@
 
 extern "C" Plugin* createPlugin() {
    //ros::init(NULL, NULL,"graspit_shape_completion_node");
-  return new graspit_ros_planning::RosGraspitInterface();
+  return new graspit_ros_planning::RosSceneBuilder();
 }
 
 extern "C" std::string getType() {

@@ -37,6 +37,7 @@
 
 #include <map>
 #include <QObject>
+#include <QLabel>
 
 //GraspIt! includes
 #include <include/plugin.h>
@@ -51,7 +52,7 @@ class GraspableBody;
 
 #include <manipulation_msgs/Grasp.h>
 #include <manipulation_msgs/GraspPlanning.h>
-
+#include "graspit_msgs/RunObjectRecognitionAction.h"
 #include "graspit_shape_completion/GetSegmentedMeshedSceneAction.h"
 #include "graspit_shape_completion/CompleteMeshAction.h"
 #include <actionlib/client/simple_action_client.h>
@@ -68,7 +69,7 @@ namespace graspit_ros_planning
 
   In particular, note that this class uses the mainLoop() function to perform the ROS even management calls.
 */
-class RosGraspitInterface : public QObject, public Plugin
+class RosSceneBuilder : public QObject, public Plugin
 {
 
     Q_OBJECT
@@ -82,20 +83,28 @@ private:
 
   actionlib::SimpleActionClient<graspit_shape_completion::GetSegmentedMeshedSceneAction> *get_segmented_meshed_scene_client;
   actionlib::SimpleActionClient<graspit_shape_completion::CompleteMeshAction> *complete_mesh_client;
+  actionlib::SimpleActionClient<graspit_msgs::RunObjectRecognitionAction> *recognizeObjectsActionClient;
 
   ros::Publisher meshed_scene_repub;
   ros::Subscriber meshed_scene_sub;
 
   Body* selected_body;
 
+  QLabel * scene_segmentation_time;
+  QLabel * target_completion_time;
+  QLabel * grasp_planning_time;
+
+
   void addMesh(int mesh_index,  shape_msgs::Mesh mesh, geometry_msgs::Vector3 offset);
+  void addToWorld(const QString modelname, const QString object_name, const transf object_pose);
+  void addObject(graspit_msgs::ObjectInfo object);
 
 
 public:
   //! Inits ROS, but (for now) without passing any arguments
-  RosGraspitInterface();
+  RosSceneBuilder();
   //! Deletes the node handle and the db manager
-  ~RosGraspitInterface();
+  ~RosSceneBuilder();
   //! Creates the node handles, advertises services, connects to the database
   virtual int init(int argc, char **argv);
   //! Simply calls ros::spinOnce() to process the ROS event loop
@@ -104,11 +113,11 @@ public:
   void receivedMeshedSceneCB(const actionlib::SimpleClientGoalState& state, const graspit_shape_completion::GetSegmentedMeshedSceneResultConstPtr& result);
   void completeMeshCB(const actionlib::SimpleClientGoalState& state, const graspit_shape_completion::CompleteMeshResultConstPtr& result);
   void getSegmentedMeshesCB(const graspit_shape_completion::GetSegmentedMeshedSceneResultConstPtr& result);
-
-  public slots:
-
-      void onCaptureSceneButtonPressed();
-      void onCompleteShapeButtonPressed();
+  void objectRecognitionCB(const actionlib::SimpleClientGoalState& state, const graspit_msgs::RunObjectRecognitionResultConstPtr& result);
+public slots:
+  void onCaptureSceneButtonPressed();
+  void onCompleteShapeButtonPressed();
+  void onObjectRecButtonButtonPressed();
 
 };
 
